@@ -1,0 +1,450 @@
+<!doctype html>
+<html lang="en" data-cb="off">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Natt Niljianskul — The Briefing Room</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fontsource-variable/newsreader/index.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fontsource-variable/schibsted-grotesk/index.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fontsource-variable/jetbrains-mono/index.css">
+<style>
+:root{
+  --bg:#0f1620; --bg2:#141d29; --panel:#172231; --panel2:#1c2939; --line:#2a3a4e; --line2:#33465c;
+  --ink:#eaf1f8; --mut:#9fb1c4; --faint:#647891;
+  --accent:#d8a24a; --ice:#8fb4d8;
+  --c-cur:#d8a24a; --c-prof:#8fb4d8; --c-exec:#7fd0c0; --c-uni:#86c06a;
+  --disp:"Newsreader",Georgia,serif; --sans:"Schibsted Grotesk",system-ui,sans-serif; --mono:"JetBrains Mono",ui-monospace,monospace;
+}
+html[data-cb="on"]{ --accent:#E69F00; --c-cur:#E69F00; --c-prof:#56B4E9; --c-exec:#009E73; --c-uni:#CC79A7; --ice:#56B4E9; --bg:#0a1019; --ink:#fff; --mut:#cdd9e6; }
+*{box-sizing:border-box} html,body{margin:0}
+body{background:var(--bg);color:var(--ink);font-family:var(--sans);line-height:1.62;overflow-x:hidden}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important;scroll-behavior:auto!important}}
+a{color:inherit}
+.wrap{max-width:1180px;margin:0 auto;padding:0 26px}
+.mono{font-family:var(--mono)} .num{font-variant-numeric:tabular-nums}
+
+/* ambient layers */
+#bg{position:fixed;inset:0;z-index:0;pointer-events:none;
+  background-image:
+    repeating-radial-gradient(circle at 18% 22%, transparent 0 46px, rgba(143,180,216,.05) 46px 47px),
+    repeating-radial-gradient(circle at 82% 78%, transparent 0 60px, rgba(216,162,74,.045) 60px 61px),
+    linear-gradient(rgba(143,180,216,.04) 1px,transparent 1px),
+    linear-gradient(90deg,rgba(143,180,216,.04) 1px,transparent 1px);
+  background-size:auto,auto,40px 40px,40px 40px;animation:drift 40s linear infinite}
+@keyframes drift{to{background-position:0 0,0 0,40px 80px,80px 40px}}
+#vig{position:fixed;inset:0;z-index:0;pointer-events:none;background:radial-gradient(120% 90% at 50% 0%,transparent 50%,rgba(0,0,0,.5))}
+main,.top{position:relative;z-index:1}
+
+/* topbar */
+.top{position:sticky;top:0;z-index:50;background:rgba(15,22,32,.82);backdrop-filter:blur(8px);border-bottom:1px solid var(--line)}
+.top .wrap{display:flex;align-items:center;gap:14px;height:56px;flex-wrap:wrap}
+.brand{font-family:var(--mono);font-size:12px;letter-spacing:.12em;color:var(--mut);display:flex;align-items:center;gap:10px}
+.brand b{color:var(--accent);font-weight:500}
+.vbadge{font-family:var(--mono);font-size:10px;letter-spacing:.2em;color:var(--faint)}
+.sp{flex:1}
+.ctrl{display:flex;align-items:center;gap:8px}
+.btn{font-family:var(--mono);font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--mut);background:transparent;border:1px solid var(--line2);padding:7px 12px;cursor:pointer;transition:.18s}
+.btn:hover{color:var(--ink);border-color:var(--accent)}
+.btn[aria-pressed="true"]{background:var(--accent);border-color:var(--accent);color:var(--bg)}
+.reset{border-color:var(--accent);color:var(--accent);opacity:0;pointer-events:none}.reset.show{opacity:1;pointer-events:auto}
+.lang{position:relative}
+.langmenu{position:absolute;right:0;top:42px;background:var(--panel);border:1px solid var(--line2);min-width:168px;display:none;z-index:60;box-shadow:0 18px 44px rgba(0,0,0,.5)}
+.langmenu.open{display:block}
+.langmenu button{display:flex;width:100%;gap:10px;align-items:center;background:none;border:0;border-bottom:1px solid var(--line);color:var(--ink);padding:9px 12px;cursor:pointer;font-family:var(--sans);font-size:13px;text-align:left}
+.langmenu button:last-child{border-bottom:0}.langmenu button:hover{background:var(--panel2)}
+.langmenu .soon{margin-left:auto;font-family:var(--mono);font-size:9px;letter-spacing:.14em;color:var(--faint);text-transform:uppercase}
+.langmenu button[disabled]{color:var(--faint);cursor:not-allowed}
+
+/* header briefing */
+.head{padding:50px 0 26px}
+.statusline{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--line);border:1px solid var(--line);margin-bottom:30px}
+.statusline .c{background:var(--bg2);padding:11px 15px}
+.statusline .k{font-family:var(--mono);font-size:9.5px;letter-spacing:.18em;text-transform:uppercase;color:var(--faint)}
+.statusline .v{font-family:var(--mono);font-size:12.5px;margin-top:5px;color:var(--mut);word-break:break-word}
+.statusline a:hover{color:var(--accent)}
+.kick{font-family:var(--mono);font-size:11px;letter-spacing:.26em;text-transform:uppercase;color:var(--accent);margin:0 0 14px}
+h1{font-family:var(--disp);font-weight:500;font-size:clamp(44px,8vw,104px);line-height:.92;margin:0;letter-spacing:-.01em}
+h1 em{font-style:italic;color:var(--ice)}
+.tagline{font-family:var(--sans);font-weight:500;font-size:clamp(14px,1.6vw,18px);margin:18px 0 0;color:var(--mut)}
+.tagline b{color:var(--ink);font-weight:600}
+.summary{margin-top:24px;border-left:2px solid var(--accent);background:linear-gradient(90deg,rgba(216,162,74,.06),transparent);padding:16px 22px;max-width:78ch;color:var(--mut);font-size:15px}
+
+/* capability matrix */
+.cap{padding:30px 0 8px}
+.cap .lab{font-family:var(--mono);font-size:10px;letter-spacing:.2em;text-transform:uppercase;color:var(--faint);margin:0 0 14px}
+.matrix{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+.tile{position:relative;text-align:left;background:var(--panel);border:1px solid var(--line);padding:16px 16px 16px 20px;cursor:pointer;transition:.22s;overflow:hidden}
+.tile::before{content:"";position:absolute;left:0;top:0;bottom:0;width:3px;background:var(--line2);transition:.22s}
+.tile:hover{border-color:var(--line2);background:var(--panel2);transform:translateY(-2px)}
+.tile .ix{font-family:var(--mono);font-size:11px;color:var(--faint);letter-spacing:.1em}
+.tile .tt{font-family:var(--disp);font-weight:500;font-size:18px;margin:6px 0 4px;line-height:1.15}
+.tile .ss{font-size:12.5px;color:var(--mut);line-height:1.4}
+.tile.active{border-color:var(--accent);background:var(--panel2)}
+.tile.active::before{background:var(--accent)}
+.tile.active .ix{color:var(--accent)}
+html[data-cb="on"] .tile.active{background-image:repeating-linear-gradient(45deg,rgba(230,159,0,.16) 0 6px,transparent 6px 12px)}
+
+/* dossier timeline */
+.sec{padding:46px 0}
+.sh{display:flex;align-items:center;gap:14px;margin:0 0 8px}
+.sh .tag{font-family:var(--mono);font-size:10px;letter-spacing:.16em;color:var(--accent);border:1px solid var(--accent);padding:4px 9px}
+.sh h2{font-family:var(--disp);font-weight:500;font-size:clamp(24px,3.2vw,38px);margin:0}
+.sh .ln{flex:1;height:1px;background:var(--line)}
+.sub{font-size:12.5px;color:var(--mut);margin:0 0 18px}
+.bar{display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin:0 0 24px}
+.seg{display:flex;border:1px solid var(--line2);overflow:hidden}
+.seg button{font-family:var(--mono);font-size:11px;letter-spacing:.04em;text-transform:uppercase;background:var(--panel);border:0;border-right:1px solid var(--line);color:var(--mut);padding:9px 13px;cursor:pointer;transition:.18s}
+.seg button:last-child{border-right:0}.seg button:hover{color:var(--ink)}
+.seg button.active{background:var(--accent);color:var(--bg)}
+html[data-cb="on"] .seg button.active{background-image:repeating-linear-gradient(45deg,rgba(0,0,0,.25) 0 5px,transparent 5px 10px)}
+.sw{display:inline-flex;align-items:center;gap:9px;font-family:var(--mono);font-size:11px;letter-spacing:.04em;text-transform:uppercase;color:var(--mut);cursor:pointer;user-select:none}
+.sw .track{width:36px;height:18px;border:1.5px solid var(--line2);border-radius:999px;position:relative;transition:.2s;flex:0 0 auto}
+.sw .track::after{content:"";position:absolute;top:1px;left:1px;width:12px;height:12px;border-radius:50%;background:var(--faint);transition:.2s}
+.sw.on .track{border-color:var(--accent)}.sw.on .track::after{left:18px;background:var(--accent)}.sw.on{color:var(--ink)}
+
+.tl{position:relative;padding-left:30px}
+.tl::before{content:"";position:absolute;left:7px;top:6px;bottom:6px;width:2px;background:var(--line);transform-origin:top;transform:scaleY(0);transition:transform 1.4s ease}
+.tl.drawn::before{transform:scaleY(1)}
+.row{position:relative;border:1px solid var(--line);background:var(--panel);margin-bottom:10px;transition:.25s}
+.row::before{content:"";position:absolute;left:-27px;top:18px;width:11px;height:11px;border-radius:50%;background:var(--bg);border:2px solid var(--cc,var(--line2))}
+.row.hide{display:none}
+.row:hover{border-color:var(--line2)}
+.row .hd{display:grid;grid-template-columns:auto 1fr auto;gap:14px;align-items:center;padding:15px 18px;cursor:pointer}
+.row .idx{font-family:var(--mono);font-size:11px;color:var(--faint)}
+.row .ht .t{font-family:var(--disp);font-weight:500;font-size:18px;line-height:1.15}
+.row .ht .o{font-size:12.5px;color:var(--mut);margin-top:2px}
+.row .meta{display:flex;align-items:center;gap:10px;flex-wrap:wrap;justify-content:flex-end}
+.row .loc{font-size:11.5px;color:var(--mut)}
+.row .catpill{font-family:var(--mono);font-size:9px;letter-spacing:.1em;text-transform:uppercase;color:var(--cc,var(--mut));border:1px solid var(--cc,var(--line2));padding:2px 7px}
+.row .mk{font-family:var(--mono);font-size:9px;letter-spacing:.08em;text-transform:uppercase;color:var(--accent)}
+.row .mk.cur{color:var(--c-cur)}
+.row .caret{font-family:var(--mono);color:var(--faint);transition:.25s;margin-left:6px}
+.row.open .caret{transform:rotate(90deg);color:var(--accent)}
+.row .bdwrap{display:grid;grid-template-rows:0fr;transition:grid-template-rows .35s ease}
+.row.open .bdwrap{grid-template-rows:1fr}
+.row .bd{overflow:hidden}
+.row .bdin{padding:0 18px 18px 18px}
+.row .bdin ul{margin:0;padding-left:18px}
+.row .bdin li{margin:0 0 8px;font-size:13.5px;color:#c4d2e0}
+.row .bdin li strong{color:var(--ink);font-weight:600}
+.row .tags{margin-top:12px;display:flex;gap:6px;flex-wrap:wrap}
+.row .tags span{font-family:var(--mono);font-size:9px;letter-spacing:.06em;text-transform:uppercase;color:var(--faint);border:1px solid var(--line);padding:2px 7px}
+
+/* commendations + two-col */
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:26px}
+.block{border:1px solid var(--line);background:var(--panel);padding:22px}
+.block .ph{font-family:var(--mono);font-size:10px;letter-spacing:.16em;text-transform:uppercase;color:var(--accent);margin:0 0 14px}
+.chips{display:flex;flex-wrap:wrap;gap:9px}
+.chip{font-size:12.5px;border:1px solid var(--line2);padding:9px 13px;color:var(--mut);max-width:340px;line-height:1.4}
+.chip strong{color:var(--ink);font-weight:600}
+.list li{padding:9px 0;border-bottom:1px solid var(--line);font-size:13px;color:var(--mut);list-style:none}
+.list{margin:0;padding:0}.list li:last-child{border-bottom:0}.list li strong{color:var(--ink)}
+.advli{display:grid;grid-template-columns:118px 1fr;gap:12px}
+.advli .y{font-family:var(--mono);font-size:11px;color:var(--c-prof)}
+
+/* expertise matrix */
+.expgrid{display:flex;flex-wrap:wrap;gap:8px}
+.expgrid span{font-family:var(--mono);font-size:11.5px;border:1px solid var(--line);padding:7px 12px;color:var(--mut);transition:.2s}
+.expgrid span:hover{color:var(--ink);border-color:var(--ice)}
+.expgrid span.hide{display:none}
+
+/* doctrine */
+.doctrine{margin:54px 0 0;border:1px solid var(--accent);position:relative;padding:64px 30px;text-align:center;background:linear-gradient(180deg,rgba(216,162,74,.05),transparent)}
+.doctrine::before{content:"DOCTRINE";position:absolute;top:-10px;left:50%;transform:translateX(-50%);background:var(--bg);padding:0 14px;font-family:var(--mono);font-size:10px;letter-spacing:.28em;color:var(--accent)}
+.doctrine blockquote{max-width:860px;margin:0 auto;font-family:var(--disp);font-style:italic;font-weight:400;font-size:clamp(20px,2.9vw,32px);line-height:1.36}
+.doctrine cite{display:block;margin-top:22px;font-style:normal;font-family:var(--mono);font-size:11px;letter-spacing:.2em;text-transform:uppercase;color:var(--mut)}
+
+footer{padding:44px 0;font-family:var(--mono);font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--faint);text-align:center}
+
+.reveal{opacity:0;transform:translateY(16px);transition:.6s}.reveal.in{opacity:1;transform:none}
+.toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%) translateY(18px);background:var(--panel);border:1px solid var(--line2);color:var(--ink);padding:10px 18px;font-family:var(--mono);font-size:12px;opacity:0;transition:.3s;z-index:80}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+
+@media(max-width:900px){
+  .statusline{grid-template-columns:1fr 1fr}.matrix{grid-template-columns:1fr 1fr}.grid2{grid-template-columns:1fr}
+}
+@media(max-width:600px){.statusline{grid-template-columns:1fr}.matrix{grid-template-columns:1fr}.row .hd{grid-template-columns:auto 1fr}.row .meta{grid-content:start;justify-content:flex-start}}
+</style>
+</head>
+<body>
+<div id="bg"></div><div id="vig"></div>
+
+<header class="top">
+  <div class="wrap">
+    <div class="brand"><b>NN</b> // EXEC-DOSSIER · 2026</div>
+    <span class="sp"></span>
+    <span class="vbadge">VARIANT 05</span>
+    <div class="ctrl">
+      <button class="btn reset" id="reset">↺ Reset</button>
+      <button class="btn" id="cb" aria-pressed="false">◐ Colour-blind</button>
+      <div class="lang"><button class="btn" id="langbtn">🇬 EN ▾</button><div class="langmenu" id="langmenu"></div></div>
+    </div>
+  </div>
+</header>
+
+<main>
+  <section class="head">
+    <div class="wrap">
+      <div class="statusline" id="statusline"></div>
+      <p class="kick">Executive Intelligence Briefing</p>
+      <h1>Natt Niljianskul, <em>multiplied.</em></h1>
+      <p class="tagline"><b>Empathetic &amp; Caring C-Suite Leader</b> · Retail · Online · E-Commerce · Financial Services</p>
+      <p class="summary" id="bio"></p>
+    </div>
+  </section>
+
+  <section class="cap">
+    <div class="wrap">
+      <p class="lab reveal">Capability Matrix — select a thematic strength to filter the dossier &amp; expertise</p>
+      <div class="matrix reveal" id="matrix"></div>
+    </div>
+  </section>
+
+  <section class="sec">
+    <div class="wrap">
+      <div class="sh reveal"><span class="tag">SEC-02</span><h2>The Dossier</h2><span class="ln"></span></div>
+      <p class="sub reveal">Twenty-two chapters across current mandate, professional record, executive education and degrees. Expand any entry. Filter by segment, switch or matrix.</p>
+      <div class="bar reveal">
+        <div class="seg" id="seg"></div>
+        <span class="sw" id="swCur" role="switch" aria-checked="false"><span class="track"></span>Current role(s)</span>
+        <span class="sw" id="swHl" role="switch" aria-checked="false"><span class="track"></span>★ Highlights</span>
+      </div>
+      <div class="tl reveal" id="tl"></div>
+    </div>
+  </section>
+
+  <section class="sec" style="padding-top:0">
+    <div class="wrap">
+      <div class="grid2">
+        <div class="block reveal"><p class="ph">Commendations · Awards &amp; Scholarships</p><div class="chips" id="awards"></div></div>
+        <div class="block reveal"><p class="ph">Counsel · Advisory Mandates</p><ul class="list" id="adv"></ul></div>
+        <div class="block reveal"><p class="ph">Faculty · Teaching &amp; Lecturing</p><ul class="list" id="teach"></ul></div>
+        <div class="block reveal"><p class="ph">Tongues · Languages</p><ul class="list" id="langs"></ul></div>
+      </div>
+      <div class="block reveal" style="margin-top:26px"><p class="ph">Index · Core Expertise</p><div class="expgrid" id="exp"></div></div>
+    </div>
+  </section>
+
+  <div class="wrap">
+    <section class="doctrine reveal">
+      <blockquote id="quote"></blockquote>
+      <cite>— N. Niljianskul · signed off</cite>
+    </section>
+  </div>
+</main>
+
+<footer>AI-assisted · colour-blind-friendly · an experimental redesign — The Briefing Room</footer>
+<div class="toast" id="toast"></div>
+
+<script>
+/* ===== DATA — verbatim from the live CV. Per-card dates were not present in the source extract, so none are invented. ===== */
+/* cat: current|prof|exec|uni · cur: current-role flag · hl: journey highlight · th: theme ids. Flip any flag in place to re-tune filters. */
+const CONTACT=[['Subject','Natt Niljianskul'],['Sectors','Retail · Online · E-Com · FinServ'],['Status','Empathetic & Caring C-Suite'],['Base','🇹🇭 Bangkok, Thailand'],['Born','10 May 1986'],['Tel','+66 (0) 85 554 4553'],['Email','<a href="mailto:natt.niljianskul@outlook.com">natt.niljianskul@outlook.com</a>'],['Network','<a href="https://www.linkedin.com/in/nattnet/" target="_blank" rel="noopener">linkedin.com/in/nattnet</a>'],['Clearance','For introduction']];
+const BIO=`A top-management executive who reads a business top-down and works the hard problems alongside his teams — coaching people into leaders in their own right. His range spans strategy, finance, family business, start-ups and digital transformation; whatever he takes on — teams, systems or balance sheets — he strengthens and develops, helping businesses mature into institutional-grade enterprises that stand the test of time — and stay worthy of their name.`;
+const THEMES=[
+ {id:'people',t:'People-Empowering Executive',s:'groom people to advance the businesses'},
+ {id:'finance',t:'Full-Spectrum Finance Leader',s:'debt/equity financing · treasury management'},
+ {id:'strategy',t:'Value-Driven Hands-On Strategist',s:'corporate/financial strategy · value creation'},
+ {id:'family',t:'Family Business → Enterprise',s:'legacy forward → institutionally governed'},
+ {id:'ai',t:'AI-Powered Digital Transformation',s:'nurture a data-driven, People × AI culture'},
+ {id:'startups',t:'Co-founders & Start-ups Enabler',s:'solidify foundations for durable scaling'},
+];
+const CATS=[{id:'current',l:'Current'},{id:'prof',l:'Professional'},{id:'exec',l:'Exec-Ed'},{id:'uni',l:'University'}];
+const CATLABEL={current:'Current',prof:'Professional',exec:'Exec-Ed',uni:'University'};
+const J=[
+ {t:`Chief Financial Officer`,o:`Ripples Commerce`,loc:`🇹 Bangkok · 🇻🇳 Ho Chi Minh City`,cat:'current',cur:true,hl:true,th:['people','finance','strategy','ai','startups'],b:[
+  `**Joined at the co-founders' invitation and led a 30+-person organisation** spanning Finance & Accounting, HR, Management Office (corporate strategy function) and Business Intelligence — carrying four functions through **the most demanding chapter** of a fast-scaling young company.`,
+  `**Rebuilt the Finance & Accounting team** and put internal controls and procedures in place from scratch — **clearing two years of statutory backlog** — while carrying the company abroad: **setting up Ripples Commerce Vietnam, the first overseas location, in Ho Chi Minh City**.`,
+  `**Took over and ran HR as de-facto Chief People Officer** — recruiting, retention, engagement — tackling the root cause that had been holding the whole business back, and turning it into **a place strong talent wanted to join**.`,
+  `**Championed AI and data across the organisation** — **empowering people to use AI rather than be replaced by it** — lifting the company's sophistication far faster than headcount ever could.`,
+  `**Re-scoped the original sell-side PE mandate** — counselling the founders to **put substance before the sale**, deferring any transaction until the business could genuinely carry it.`,
+  `**Led the fixing and the building in parallel** — from a deficit starting point, where little was in place, to a **compliant, de-risked foundation** on which revenue more than doubled: **THB 282m → 605m**.`,
+  `**Stepped out of the executive seat into a co-founders' advisory role** after completing the FY2025 statutory filing, having held the company steady through successive crises. **What was built endures** — the company is on course to break **THB 1 billion** this year (2026).`]},
+ {t:`Mastering the Table`,o:`Julius Baer × Executive School of the University of St. Gallen`,loc:`🇯🇵 Tokyo`,cat:'exec',cur:false,hl:false,th:['people','strategy'],b:[
+  `A near two-week executive programme on **the craft of negotiation** — one chapter of an annual series by **Julius Baer, IMD and the Executive School of the University of St. Gallen**, rotating its theme and host city each year.`,
+  `From game theory and tactical empathy to a **former FBI hostage negotiator's keynote** — alongside rare encounters with Japan's living legacies: the 18th-generation head of Toraya and the 19th head of the Tokugawa shogunal house.`,
+  `Took the **"Seal the Deal" stage** to co-present _"Building Trust, Not Just Deals: Understanding Japanese Negotiation Culture"_ — a first-hand case in negotiating trust across cultures.`]},
+ {t:`Oxford Lenses on Leadership`,o:`Saïd Business School, University of Oxford`,loc:`🇬 Oxford`,cat:'exec',cur:false,hl:true,th:['people','strategy','ai'],b:[
+  `Leadership examined through genuinely multi-disciplinary **lenses** — how the **architecture of a building and its interior can project a leadership**; how **values travel** from what mattered in the past, to what people prize today, to what they will tomorrow.`,
+  `The craft itself, classic and current — **trust and culture, accepting criticism, managing up as deftly as one manages down** — capped by a dedicated session on **AI in leadership**.`,
+  `The deepest lens: the **Olympic Gold-Medal Winning Mindset** — preparation as the leader's real craft, the win made long before the day — and the **monster mentality a team builds together**, with someone willing to lead it.`]},
+ {t:`Shareholders' vs Stakeholders' Capitalism`,o:`Hitotsubashi University, School of International Corporate Strategy (ICS)`,loc:`🇯 Tokyo`,cat:'exec',cur:false,hl:false,th:['strategy','family'],b:[
+  `Macro-level capital allocation across stakeholders — Japan's harmony-first tradition set against the West's growth-at-pace — and **the position a modern executive must continuously calibrate between the two**.`,
+  `Long-held convictions on sustainable, stakeholder-minded leadership, **put into a formal frame and backed by real-world cases**.`,
+  `Ranged from **national innovation systems, centres of excellence and hyper-coordinated capitalism** to the quieter lessons: how **a society's culture becomes its corporations' culture** — and Zen mindfulness as the executive's anchor through landscapes that will not stop shifting.`]},
+ {t:`Co-founder & Investor`,o:`Hoot Hoot Coffee & Co 🦉`,loc:`🇹🇭 Bangkok`,cat:'current',cur:true,hl:false,th:['startups','strategy','finance'],b:[
+  `**Co-founded a specialty-coffee venture with friends** — bringing **a true connoisseur's depth in coffee and matcha**, down to a matcha programme sourced from Yame, Fukuoka.`,
+  `**Helped shape the business plan and financial projections** before incorporation — now leaning into operations and finance as the cafe finds its rhythm.`,
+  `**Shaping the retail strategy and brand positioning with a chain strategist's playbook** — a premium, provenance-led concept where **storytelling justifies the grade** — honed over years of running far larger retail businesses.`,
+  `**Bringing a CFO's discipline to the venture and running it on data** — membership and churn analytics, scenario-modelled pricing — with **the same rigour a boardroom would expect**.`,
+  `**Systematising the back office and laying the foundations to scale** beyond the first shop — clean unit economics, and systems built so the next branch **inherits order, not improvisation**.`]},
+ {t:`The Future of Longevity`,o:`Sasin School of Management, Chulalongkorn University × MIT Sloan School of Management`,loc:`🇹🇭 Bangkok`,cat:'exec',cur:false,hl:false,th:['strategy','ai'],b:[
+  `A multidisciplinary reading of ageing societies and the longevity economy — finance, policy, healthcare and cities — **keynoted by Nobel laureate Robert C. Merton**.`,
+  `From the economics of longer lives to **AI-driven health sensing** and the cities ageing societies will need — a slow-motion tsunami crossing every market it touches.`,
+  `The leadership case: **foresight here is a head start** — leaders who read demographic change early can strategise and move first, on what is no healthcare story but a **wholesale shift in how societies live, work, spend and age** — and in every business that serves them.`]},
+ {t:`Energize others, Ignite change`,o:`Julius Baer × Executive School of the University of St. Gallen`,loc:`🇹 Bangkok`,cat:'exec',cur:false,hl:false,th:['people'],b:[
+  `A peer-learning-based leadership development programme on inspiring people and teams, and leading purposeful change — its scope spanning teams, start-ups and communities.`,
+  `Leadership studied from young start-ups to century-old houses — founders still building, and leaders who have endured — through keynotes, workshops and intimate **CEO roundtables**.`,
+  `A global cohort — and a programme that made room for **giving back and wellbeing alongside ambition**. Followed a year later to the series' Tokyo chapter.`]},
+ {t:`Chief Financial Officer`,o:`Marketing Tree`,loc:`🇹 Bangkok`,cat:'prof',cur:false,hl:false,th:['finance','strategy'],b:[
+  `**Joined a fast-scaled, strongly cash-generative marketing business as its strategic CFO** — brought in to put surplus cash to productive use through investment.`,
+  `**Chose to put order first**: instituted financial governance and remediated the accounting and statutory filings — a duty of care taken on beyond the mandate, because **a CFO safeguards the integrity of the numbers**.`,
+  `**Evaluated investment avenues for the surplus balance sheet** while rebuilding the discipline beneath it.`,
+  `**Stepped away when the governance direction diverged from professional standards** — a short chapter, closed with **integrity intact**.`]},
+ {t:`Navigating Family Enterprise into the Future (NxGen Executive Education)`,o:`International Institute for Management Development (IMD)`,loc:`🇨 Lausanne`,cat:'exec',cur:false,hl:false,th:['family','finance'],b:[
+  `Built on the Institute's **generations-long study of family businesses** — success and failure weighed equally: the structures and governance that carry an enterprise from one generation to the next, and the astounding cases where a **family business became a family enterprise** that endures.`,
+  `**The cohort's only outside executive among owners and heirs** — a vantage that drove every exchange deeper and let the whole room reflect more honestly: how different generations think, what successful transition demands, and how legacy is preserved — and sometimes quietly lost — along the way.`,
+  `The finance of families, **beyond structure and tax**: family offices, the engagement of private banks, and **foundations built so the enterprise lives on** — giving back to society in a form that outlasts any balance sheet.`]},
+ {t:`Group Chief Financial Officer`,o:`Tungthanasin / Easy Money`,loc:`🇹🇭 Pathum Thani`,cat:'prof',cur:false,hl:true,th:['finance','family','ai','strategy'],b:[
+  `**Arrived by way of a consulting diagnosis** — a two-workstream engagement on financial and organisational strategy, commissioned by the CEO — and was **recruited to execute the plan as Group CFO**.`,
+  `**Served a second-generation family business** running an asset-backed lending operation the size of a mini financial institution — as the owning family's **primary finance liaison**, with seats on the Ex-Com, the Investment Board and the Risk Management & Control Board — driving its **professionalisation toward a true family enterprise**.`,
+  `**Directed funding, treasury and banking relationships group-wide**, and restructured **~THB 6bn** of debt into the capacity to draw up to **~THB 20bn** in facilities — **a patient, multi-move re-engineering of the debt stack** that steadily brought the cost of capital down while keeping risk locked through volatile, uncertain times.`,
+  `**Financed the group's aggressive post-COVID expansion** — the branch network grew from **~50 to 100+** — as the group's valuation climbed toward ~THB 24 billion.`,
+  `**Led the IPO drive end-to-end** — switching the group over to the PAE accounting standard and laying the groundwork for a credit rating — partnering big-4 auditors and investment banks, and carrying the group to **public-market readiness**.`,
+  `**Invested as heavily in people as in the balance sheet** — pushing hard on the finance team's development, and designing the **"to-be CFO organisation"** the group would need beyond a listing.`,
+  `**Built a digital-transformation team from a standing start** — hire by hire, trained into a team of stars — leaving behind a data-oriented culture where decisions arrive armed with **insight, not hindsight**.`,
+  `**Designed a bespoke gold price-risk management and control system** amid wildly volatile gold prices — **bank-grade risk discipline**, re-engineered for a gold-backed loan book.`]},
+ {t:`Chief Strategy & Investment Officer`,o:`NamSilpThai – Better Vision Group (now Vision Ventures)`,loc:`🇹🇭 Nonthaburi · 🇸 Singapore · 🇲🇾 Kuala Lumpur`,cat:'prof',cur:false,hl:true,th:['strategy','family','startups','people'],b:[
+  `**Joined a ~70-year-old family business** — the house behind Thailand's first eyewear chain, grown beyond 100 stores across Thailand, Singapore and Malaysia — as the **first outside professional executive** in a top management team that had been, until then, a **family-exclusive club**.`,
+  `**Drove the group's strategy on a multi-year horizon** — planning, budgeting, investment and business development — and spearheaded its **pioneering push into e-commerce**, wearing whatever leadership hat each chapter demanded across several business units.`,
+  `**Earned an outsider's mandate** the only way a decades-old family firm grants one — patiently, initiative by initiative, until results compounded into trust — culminating in **a seat on the family holding companies' board and strategic committee**, overseeing group strategy, business development and investment from deal negotiation through to execution.`,
+  `**Led strategic projects with lasting marks** — a Japan partnership forged through a year of _nemawashi_, its product a **best-seller years on**; a supply-chain redesign that cut lead times from months to weeks and carried the group through COVID; investment and expansion ventures across Malaysia, Singapore and Indonesia.`,
+  `Coached and mentored **20+ direct reports** — next-generation family among them — spotting overlooked people, handing them stretch work, and watching several grow into **mainstays who serve the organisation still**.`,
+  `**Led the family's PE sell-side exit** — a deal engineered to the **owners' best interests** down to its finest mechanics — attracting a growth fund as strategic investor and beginning the **journey to a family enterprise**; retained as advisor through the consolidation that readied the group for an eventual listing.`]},
+ {t:`Client-centric Coaching Programme (Executive Coaching)`,o:`Business Cognition × University of Cambridge`,loc:`🇬🇧 Cambridge`,cat:'exec',cur:false,hl:false,th:['people'],b:[
+  `A structured **executive-coaching formation** — delivered remotely and through a week in the United Kingdom, sponsored by the firm.`,
+  `The first formal frame around an instinct already in daily use: **developing people as the route to results**.`]},
+ {t:`Intermediate & Advanced Treasury Risk Management`,o:`Wealth Management Institute of Singapore (WMI)`,loc:`🇸🇬 Singapore`,cat:'exec',cur:false,hl:false,th:['finance'],b:[
+  `Bank-grade **treasury risk disciplines, taken to intermediate and advanced level** — sponsored by the firm through the Sage Capital years.`,
+  `The formal foundation beneath the **treasury, hedging and risk-framework advisory** of the Sage Capital years — and, a chapter later, beneath a gold-backed balance sheet.`]},
+ {t:`Assoc. Director & Deputy Country Head, TH`,o:`Sage Capital`,loc:`🇸🇬 Singapore · 🇹🇭 Bangkok`,cat:'prof',cur:false,hl:false,th:['finance','strategy'],b:[
+  `**Began in private equity investment in Singapore**, then moved across to the firm's newly-established advisory practice as it stood up — and thrived there.`,
+  `**Part of the small team that turned a six-month trial engagement** with one of Thailand's biggest banks **into a multi-year partnership** — re-pitched, expanded, and scaled **roughly sevenfold** at its peak — a client the firm retains to this day.`,
+  `**Advised the bank's treasury division** across trading and hedging strategies, treasury risk, and global risk frameworks — **bank-grade disciplines carried into every balance sheet worked on since**.`,
+  `**Helped establish the firm's Thai presence** — setting up the local office, recruiting its people, and re-incorporating the advisory practice for cross-border efficiency.`,
+  `**Measured the work by what stayed behind**: **client teams that came out stronger**, and strategy, risk and controls that held through the hardest of times.`,
+  `**Promoted from Senior Associate to Associate Director & Deputy Country Head (Thailand) within two years** — departing in **exceptional standing**.`]},
+ {t:`Senior Consultant, Strategy & Operations`,o:`Deloitte Consulting SEA`,loc:`🇹🇭 Bangkok · 🇸🇬 Singapore · 🇮🇩 Jakarta`,cat:'prof',cur:false,hl:false,th:['strategy'],b:[
+  `**A senior member of project teams addressing C-level business issues** across Southeast Asia's diverse industries — bringing recommendations to the region's top corporate executives.`,
+  `**Led the Technology-Media-Telecommunications (TMT) practice as a subject matter expert**, while also serving as a non-core industry member in Financial Services-Real Estate (FSI-RE).`,
+  `**Contributed to engagements of genuinely national weight** — growth strategy and end-to-end value-chain re-engineering for one of Thailand's top property developers, Thailand's strategic blueprint for foreign direct investment, a country strategy for international trade and public services, and Jakarta's transit-payment strategy.`]},
+ {t:`Doing Business in Asia`,o:`Hitotsubashi University × Seoul National University × Peking University`,loc:`🇯🇵 Tokyo · 🇰🇷 Seoul · 🇨🇳 Beijing`,cat:'exec',cur:false,hl:false,th:['strategy'],b:[
+  `**Selected as Hitotsubashi University's delegate** — on a scholarship granted by the three participating institutions.`,
+  `Three weeks of executive education on doing business in **Japan, Korea and China** — taught across the three campuses, in **Tokyo, Seoul and Beijing** — exchanging views with peers drawn from across the globe.`]},
+ {t:`Government Research Scholar`,o:`Government of Japan (JASSO) & Hitotsubashi University`,loc:`🇯 Tokyo`,cat:'prof',cur:false,hl:false,th:['strategy'],b:[
+  `**Appointed research scholar to the Japanese government** — the working obligation attached to the MEXT Young Leaders' Programme's extra grants, carried alongside the MBA itself.`,
+  `Worked at what was then the **frontier of Competitiveness & Clusters theory** — Hitotsubashi University's collaboration with Harvard Business School and Prof. Michael Porter — examining which home-country industries could genuinely hold their own on the world stage.`,
+  `**Delivered an extensive analysis of Thailand's medical and medical-tourism cluster** — finding a competitive moat near-impossible to replicate, and recommending Japan engage through **strategic partnership and investment rather than imitation** — feeding the government's industrial-policy thinking.`]},
+ {t:`MBA in International Business Strategy & Finance`,o:`Hitotsubashi University, School of International Corporate Strategy (ICS)`,loc:`🇯🇵 Tokyo`,cat:'uni',cur:false,hl:true,th:['strategy','finance'],b:[
+  `Earned the MBA as a **MEXT Young Leaders' Programme** scholar — one of ~15 selected across Asia-Pacific that year, and the only Thai.`,
+  `Graduated in the **top decile** of the class, despite arriving as its youngest member.`,
+  `**Served in parallel as a Government Research Scholar** to the Japanese government — a professional chapter of its own.`,
+  `Filled every term break with **internships at blue-chip houses** — corporate strategy at NEC-Lenovo Japan, investment banking at UBS Japan working a sizeable corporate-debenture issuance, and two full stints in management consulting at BCG — **a rare breadth for a single MBA year**.`]},
+ {t:`Business Development Analyst (CEO Office)`,o:`True Corporation`,loc:`🇹🇭 Bangkok`,cat:'prof',cur:false,hl:false,th:['strategy','startups'],b:[
+  `**One of five in the CEO's backroom Strategy & Innovation unit** — a self-managed team **reporting directly to the President/CEO**, turning his visionary ideas into non-routine strategic projects and business innovations.`,
+  `**Helped arrange — and complete — the strategic deals of the group's smart-device era**: on the negotiating team for **Apple's iPhone launch in Thailand**, with co-branding, partnership and investment deals spanning Google, Motorola's early Android, Microsoft, AWS — and big-name VCs and start-ups besides.`,
+  `Steered working groups through the company's transformation **from a SIM-and-minutes telco into a smart-device retailer** — business planning, portfolio building, budgeting, financial projections — contributing to the group's leap from market **#3 to #2**.`,
+  `**Cut teeth on the harder crafts early**: commercial and regulatory due diligence on a major telecom M&A, and a group-restructuring proposal whose logic was, in hindsight, **years ahead of its time**.`]},
+ {t:`Network / Graduate Engineer`,o:`Cisco Systems, London`,loc:`🇬🇧 London`,cat:'prof',cur:false,hl:false,th:['ai'],b:[
+  `**Selected into Cisco's competitive London-office graduate scheme** — a rotational programme of twelve graduates, moving across sales engineering, network architecture, embedded software development and corporate functions.`,
+  `Worked on **Cisco Aironet firmware development** and on the IT-infrastructure planning for the **London 2012 Olympic Park** site.`,
+  `**The engineering grounding remains** — enough to read code, think in its structures, and **build alongside AI** — the quiet enabler of the digital-, data- and AI-transformation leadership that came later.`]},
+ {t:`BEng (Hons) Electronic & Computer Engineering`,o:`University of Nottingham`,loc:`🇬🇧 Nottingham`,cat:'uni',cur:false,hl:true,th:['ai','people'],b:[
+  `**Completed the final two years of the dual-degree programme at Nottingham**, on the University's International Student Scholarship — graduating with **upper second-class honours**.`,
+  `Final-year research: a **genetic algorithm, coded from scratch**, optimising the structure of optical ASICs — awarded the year's **#1 project** and named on a **publication with the professors**.`,
+  `Played in both men's and mixed doubles for the University badminton team through its rise to the **Premier division** of the national university league — winning with the team through habits still in use today: **make your partner, and the team, play better**.`]},
+ {t:`BEng Electrical & Electronic Engineering`,o:`Thammasat University`,loc:`🇹🇭 Bangkok`,cat:'uni',cur:false,hl:false,th:['people'],b:[
+  `Entered the Thammasat–Nottingham double-degree programme **ranked #1** in the direct placement test — an entry that carried the **Dean's Scholarship** with it.`,
+  `Studied Electrical & Electronic Engineering at the Faculty of Engineering (2004–06) before transferring to Nottingham — **the Thammasat degree conferred in 2009** under the Twinning Engineering Programme (TEP).`,
+  `**The leadership formed as much outside the lecture hall as in it** — serving on the committees of the university's Cheer Club (CheerTham) and the Thammasat University Student Organisation (TUSU), representing the university in the **Harvard College in Asia Project (HCAP)**, and volunteering at the tsunami victims' relief centre on the Rangsit campus.`]},
+];
+const ADV=[
+ {y:'2026–present',t:`**Ripples Commerce** — advisor to the co-founders.`},
+ {y:'2021–22',t:`**Vision Ventures Group** — strategy & investment advisor through the post-deal consolidation.`},
+ {y:'2020',t:`**Tungthanasin Group** — corporate finance & financial-risk advisor; the diagnosis that preceded the Group CFO chapter.`},
+ {y:'2017–18 · 2023–24',t:`An e-commerce group — overseas expansion, establishing its Malaysia and Singapore entities (2017–18); returned years later to counsel its founders through heavy weather (2023–24).`},
+ {y:'2023',t:`A real-estate firm — debt restructuring ahead of a looming debenture maturity; a six-week sprint.`},
+ {y:'2023–24',t:`The Thai subsidiary of one of Japan's largest listed conglomerates — post-acquisition governance and reporting uplift, brought in fresh from the listing-readiness work at Easy Money.`},
+];
+const AWARDS=[
+ `**MEXT Young Leaders' Programme** scholarship — one of ~15 across Asia-Pacific; the year's only Thai.`,
+ `**Junior Science Talent Project (JSTP)** — the Ministry of Science and Technology's national talent scholarship (via NSTDA), cohort #4; held from Grade 10 onward.`,
+ `**Final-year engineering project of the year** — with a publication alongside the professors.`,
+ `**Dean's Scholarship, Faculty of Engineering, Thammasat University** — earned by entering the dual-degree programme ranked #1.`,
+ `**University of Nottingham International Student Scholarship.**`,
+ `_Doing Business in Asia_ — its own scholarship, as Hitotsubashi University's delegate.`,
+];
+const TEACH=[
+ `**Visiting lecturer** (2010–23) — Chulalongkorn University, Kasetsart University (Bangkhen), Thammasat University (Rangsit) and Naresuan University (Phitsanulok) — teaching telecommunication infrastructure, business planning and marketing strategy.`,
+ `**Corporate-training instructor**, Cicom Brains Group (2023).`,
+];
+const LANGS=[
+ `**English** — full professional (British English), bilingual proficiency — **IELTS 8.5 overall**.`,
+ `**Thai** — native (mother tongue).`,
+ `**Japanese** — basic.`,
+];
+const EXP=[['Empowering leadership','people'],['People leadership','people'],['Corporate finance','finance'],['Treasury','finance'],['Capital markets','finance'],['Debt restructuring','finance'],['Turnaround','finance strategy'],['M&A','finance strategy'],['Private equity','finance'],['Deal structuring','finance'],['IPO-readiness','finance family'],['Corporate governance','family strategy'],['Risk management','finance'],['Business strategy','strategy'],['Commercial strategy','strategy'],['Retail','strategy'],['Retail financial services','finance strategy'],['Family-enterprise leadership','family'],['Digital transformation','ai'],['Data & analytics','ai'],['AI transformation','ai'],['Cross-cultural leadership','people'],['Japan / SEA','people strategy']];
+const QUOTE=`Leadership isn't about knowing the most, doing the most, or always front-running. It's about making the people around you better — so that, together, we multiply what we can do and grow one percent better every day, in ways that last.`;
+const LANG=[{f:'🇬🇧',n:'English',on:true},{f:'🇹🇭',n:'ไทย',soon:true},{f:'🇯🇵',n:'日本語',soon:true},{f:'🇨🇳',n:'中文',soon:true}];
+
+const state={theme:null,cat:null,cur:false,hl:false};
+const $=s=>document.querySelector(s),$$=s=>[...document.querySelectorAll(s)];
+const esc=s=>String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+const fmt=s=>{s=esc(s);s=s.replace(/\*\*([\s\S]+?)\*\*/g,'<strong>$1</strong>');s=s.replace(/_([^_]+?)_/g,'<em>$1</em>');return s;};
+const reduce=matchMedia('(prefers-reduced-motion:reduce)').matches;
+
+$('#statusline').innerHTML=CONTACT.map(([k,v])=>`<div class="c"><div class="k">${esc(k)}</div><div class="v">${v}</div></div>`).join('');
+$('#bio').innerHTML=fmt(BIO);
+$('#matrix').innerHTML=THEMES.map((t,i)=>`<button class="tile" data-id="${t.id}"><span class="ix">CAP-${String(i+1).padStart(2,'0')}</span><div class="tt">${esc(t.t)}</div><div class="ss">${esc(t.s)}</div></button>`).join('');
+$('#seg').innerHTML=CATS.map(c=>`<button data-cat="${c.id}">${esc(c.l)}</button>`).join('');
+$('#tl').innerHTML=J.map((m,i)=>{const cc=`var(--c-${m.cat})`;return `<div class="row" data-i="${i}" data-cat="${m.cat}" data-th="${m.th.join(' ')}" data-cur="${m.cur?1:0}" data-hl="${m.hl?1:0}" style="--cc:${cc}">
+  <div class="hd"><span class="idx">${String(i+1).padStart(2,'0')}</span>
+    <div class="ht"><div class="t">${esc(m.t)}</div><div class="o">${esc(m.o)}</div></div>
+    <div class="meta"><span class="loc">${esc(m.loc)}</span><span class="catpill">${esc(CATLABEL[m.cat])}</span>${m.hl?'<span class="mk">★</span>':''}${m.cur?'<span class="mk cur">●</span>':''}<span class="caret">›</span></div></div>
+  <div class="bdwrap"><div class="bd"><div class="bdin"><ul>${m.b.map(x=>`<li>${fmt(x)}</li>`).join('')}</ul>
+    <div class="tags">${m.th.map(t=>`<span>${esc(t)}</span>`).join('')}</div></div></div></div></div>`;}).join('');
+$('#awards').innerHTML=AWARDS.map(a=>`<div class="chip">${fmt(a)}</div>`).join('');
+$('#adv').innerHTML=ADV.map(a=>`<li class="advli"><span class="y">${esc(a.y)}</span><span>${fmt(a.t)}</span></li>`).join('');
+$('#teach').innerHTML=TEACH.map(t=>`<li>${fmt(t)}</li>`).join('');
+$('#langs').innerHTML=LANGS.map(t=>`<li>${fmt(t)}</li>`).join('');
+$('#exp').innerHTML=EXP.map(([t,th])=>`<span data-th="${th}">${esc(t)}</span>`).join('');
+$('#quote').textContent=QUOTE;
+$('#langmenu').innerHTML=LANG.map(l=>`<button data-n="${l.n}" ${l.soon?'disabled':''}>${l.f} ${l.n}${l.soon?'<span class="soon">soon</span>':l.on?'<span class="soon">✓</span>':''}</button>`).join('');
+
+function anyFilter(){return !!(state.theme||state.cat||state.cur||state.hl);}
+function apply(){
+  $$('.tile').forEach(b=>b.classList.toggle('active',b.dataset.id===state.theme));
+  $$('#seg button').forEach(b=>b.classList.toggle('active',b.dataset.cat===state.cat));
+  $('#swCur').classList.toggle('on',state.cur);$('#swCur').setAttribute('aria-checked',state.cur);
+  $('#swHl').classList.toggle('on',state.hl);$('#swHl').setAttribute('aria-checked',state.hl);
+  const f=anyFilter();
+  $$('.row').forEach(el=>{const th=el.dataset.th.split(' ');
+    const ok=(!state.cat||el.dataset.cat===state.cat)&&(!state.theme||th.includes(state.theme))&&(!state.cur||el.dataset.cur==='1')&&(!state.hl||el.dataset.hl==='1');
+    el.classList.toggle('hide',!ok);
+    if(f){el.classList.toggle('open',ok);} });
+  if(!f){$$('.row').forEach(el=>el.classList.remove('open'));}
+  $$('#exp span').forEach(el=>{const th=el.dataset.th.split(' ');el.classList.toggle('hide',state.theme&&!th.includes(state.theme));});
+  $('#reset').classList.toggle('show',f);
+}
+$('#matrix').addEventListener('click',e=>{const b=e.target.closest('.tile');if(!b)return;state.theme=state.theme===b.dataset.id?null:b.dataset.id;apply();});
+$('#seg').addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;state.cat=state.cat===b.dataset.cat?null:b.dataset.cat;apply();});
+$('#swCur').addEventListener('click',()=>{state.cur=!state.cur;apply();});
+$('#swHl').addEventListener('click',()=>{state.hl=!state.hl;apply();});
+$('#reset').addEventListener('click',()=>{state={theme:null,cat:null,cur:false,hl:false};apply();});
+$('#tl').addEventListener('click',e=>{const hd=e.target.closest('.hd');if(!hd)return;if(anyFilter())return;hd.parentElement.classList.toggle('open');});
+
+let tT;function toast(m){const t=$('#toast');t.textContent=m;t.classList.add('show');clearTimeout(tT);tT=setTimeout(()=>t.classList.remove('show'),1900);}
+$('#cb').addEventListener('click',function(){const on=document.documentElement.dataset.cb==='on';document.documentElement.dataset.cb=on?'off':'on';this.setAttribute('aria-pressed',String(!on));});
+$('#langbtn').addEventListener('click',e=>{e.stopPropagation();$('#langmenu').classList.toggle('open');});
+$('#langmenu').querySelectorAll('button[disabled]').forEach(b=>b.addEventListener('click',()=>toast('Language coming soon · ยังไม่พร้อม · 近日公開')));
+document.addEventListener('click',()=>$('#langmenu').classList.remove('open'));
+
+const io=new IntersectionObserver(es=>es.forEach(en=>{if(en.isIntersecting){en.target.classList.add('in');io.unobserve(en.target);}}),{threshold:.1});
+$$('.reveal').forEach(el=>io.observe(el));
+const tio=new IntersectionObserver(es=>es.forEach(en=>{if(en.isIntersecting){$('#tl').classList.add('drawn');tio.disconnect();}}),{threshold:.15});
+tio.observe($('#tl'));
+if(reduce)$('#tl').classList.add('drawn');
+apply();
+</script>
+</body>
+</html>
